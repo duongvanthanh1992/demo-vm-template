@@ -124,7 +124,7 @@ jobs:
         working-directory: packer/
         run: >-
           packer build -force -machine-readable
-          -var-file="general.pkrvars.hcl"
+          -var-file="linux/general.pkrvars.hcl"
           -var "vsphere_endpoint=${{ secrets.VCENTER_HOSTNAME }}"
           -var "vsphere_username=${{ secrets.VCENTER_USER }}"
           -var "vsphere_password=${{ secrets.VSPHERE_PASSWORD }}"
