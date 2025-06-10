@@ -6,7 +6,6 @@
 2. [Topology](#topology)
 3. [Requirements](#requirements)
 4. [Configuration](#configuration)
-5. [FreeIPA LDAP](#freeipa)
 
 ## Introduction
 
