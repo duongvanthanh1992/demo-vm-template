@@ -10,7 +10,7 @@ RUN apt-get update && \
     apt-cache policy docker-ce; \
     apt-get install -y docker-ce
 
-COPY requirements/requirements .
+COPY requirements/requirements.apt .
 RUN apt-get update && \
     sed 's/#.*//' requirements.apt | xargs apt-get install -y && \
     apt-get clean all
