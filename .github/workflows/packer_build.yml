@@ -125,8 +125,8 @@ jobs:
         run: >-
           packer build -force -machine-readable
           -var-file="general.pkrvars.hcl"
-          -var "vsphere_endpoint=${{ env.VCENTER_HOSTNAME }}"
-          -var "vsphere_username=${{ env.VCENTER_USER }}"
+          -var "vsphere_endpoint=${{ secrets.VCENTER_HOSTNAME }}"
+          -var "vsphere_username=${{ secrets.VCENTER_USER }}"
           -var "vsphere_password=${{ secrets.VSPHERE_PASSWORD }}"
           -var "vsphere_datacenter=${{ env.VCENTER_DATACENTER }}"
           -var "vsphere_cluster=${{ env.VCENTER_CLUSTER }}"
@@ -159,8 +159,8 @@ jobs:
         run: >-
           ansible-playbook
           -i inventories/${{ inputs.build_site }}/hosts
-          -e "vsphere_endpoint=${{ env.VCENTER_HOSTNAME }}"
-          -e "vsphere_username=${{ env.VCENTER_USER }}"
+          -e "vsphere_endpoint=${{ secrets.VCENTER_HOSTNAME }}"
+          -e "vsphere_username=${{ secrets.VCENTER_USER }}"
           -e "vsphere_password=${{ secrets.VSPHERE_PASSWORD }}"
           -e "vsphere_datacenter=${{ env.VCENTER_DATACENTER }}"
           -e "vsphere_cluster=${{ env.VCENTER_CLUSTER }}"
@@ -180,8 +180,8 @@ jobs:
         run: >-
           ansible-playbook
           -i inventories/${{ inputs.build_site }}/hosts
-          -e "vsphere_endpoint=${{ env.VCENTER_HOSTNAME }}"
-          -e "vsphere_username=${{ env.VCENTER_USER }}"
+          -e "vsphere_endpoint=${{ secrets.VCENTER_HOSTNAME }}"
+          -e "vsphere_username=${{ secrets.VCENTER_USER }}"
           -e "vsphere_password=${{ secrets.VSPHERE_PASSWORD }}"
           -e "vsphere_template_final=${{ env.PACKER_TEMPLATE_NAME }}-final"
           clear-template.yml
