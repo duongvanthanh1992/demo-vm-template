@@ -21,11 +21,6 @@ on:
         required: true
         default: '.'
 
-      build_context:
-        description: 'Build Docker context'
-        required: true
-        default: 'requirements'
-
 jobs:
   build_docker_images:
     runs-on: [self-hosted, "${{ inputs.build_site }}"]
@@ -72,6 +67,5 @@ jobs:
           push: true
           no-cache: true
           context: ${{ inputs.context }}
-          build-contexts: ${{ inputs.build_context }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}

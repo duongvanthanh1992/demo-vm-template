@@ -10,7 +10,7 @@ RUN apt-get update && \
     apt-cache policy docker-ce; \
     apt-get install -y docker-ce
 
-COPY --from=requirements requirements.apt .
+COPY requirements/requirements .
 RUN apt-get update && \
     sed 's/#.*//' requirements.apt | xargs apt-get install -y && \
     apt-get clean all
@@ -20,10 +20,10 @@ RUN curl -fsSL "https://releases.hashicorp.com/packer/${PACKER_LATEST_VERSION}/p
     unzip "/tmp/packer_linux_amd64.zip" -d /usr/bin/ && \
     rm /tmp/packer_linux_amd64.zip
 
-COPY --from=requirements requirements.txt .
+COPY requirements/requirements.txt .
 RUN pip3 install --no-cache-dir -r requirements.txt && \
     rm -fr /root/.cache/pip/
 
-COPY --from=requirements requirements.yml .
+COPY requirements/requirements.yml .
 RUN ansible-galaxy collection install -v -r requirements.yml && \
     ansible-galaxy role install -v -r requirements.yml --ignore-errors
