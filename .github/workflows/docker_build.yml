@@ -71,7 +71,7 @@ jobs:
         with:
           push: true
           no-cache: true
-          context: ${{ env.CONTEXT }}
-          build-contexts: ${{ env.BUILD_CONTEXTS }}
+          context: ${{ input.context }}
+          build-contexts: ${{ inputs.build_context }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
