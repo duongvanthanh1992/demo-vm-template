@@ -2,7 +2,7 @@ name: Packer pipeline for building VM templates
 run-name: >
   Build image : ${{ inputs.vm_guest_os_name }}${{ inputs.vm_guest_os_version }} -
   Branch : ${{ github.ref_name }} -
-  Site : ${{ inputs.build_site }} -
+  Site : ${{ inputs.build_site }}
 
 on: 
   workflow_dispatch:
