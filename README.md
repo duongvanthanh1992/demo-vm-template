@@ -41,9 +41,9 @@ Note: Optionally, you can build the Docker container images and keep it locally 
 By doing so, you can reuse the container for subsequent workflows by referencing Docker images name.
 ```
 
-### Gitlab CI  - Packer Pipeline for Building Confluent Kafka
+### Gitlab CI  - Packer Pipeline for Building Golden Image
 
-`Packer Pipeline for Building Confluent Kafka` workflow automates the process of building Confluent Kafka using Packer and Ansible. Below is an explanation of each step:
+`Packer Pipeline for Building Golden Image` workflow automates the process of building Golden Image using Packer and Ansible. Below is an explanation of each step:
 
 1. **check-syntax-yml (Check YAML files)**:
    - This GitLab CI task is designed to ensure the quality and consistency of YAML files by using the `yamllint` tool. 
