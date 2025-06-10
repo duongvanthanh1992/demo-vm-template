@@ -116,6 +116,8 @@ jobs:
         working-directory: packer/
         run: >-
           packer plugins install github.com/hashicorp/vsphere
+        env:
+          PACKER_GITHUB_API_TOKEN: ${{ secrets.PACKER_GITHUB_API_TOKEN }}
 
       - name: Run Packer
         working-directory: packer/
