@@ -81,9 +81,9 @@ jobs:
       - name: Docker build arguments
         run: |
           if [ "${{ inputs.vm_guest_os_name }}" == "ubuntu" ]; then
-            echo "CONVERT_SUBNET='${{ env.VSPHERE_VM_SUBNET }}'" >> $GITHUB_ENV
-          else
-            echo "CONVERT_SUBNET='${{ env.VSPHERE_VM_NETMASK }}'" >> $GITHUB_ENV
+            echo "CONVERT_SUBNET=${{ env.VSPHERE_VM_SUBNET }}" >> $GITHUB_ENV
+          elif [ "${{ inputs.vm_guest_os_name }}" == "oracle" ]; then
+            echo "CONVERT_SUBNET=${{ env.VSPHERE_VM_NETMASK }}" >> $GITHUB_ENV
           fi
 
       # DEBUG
