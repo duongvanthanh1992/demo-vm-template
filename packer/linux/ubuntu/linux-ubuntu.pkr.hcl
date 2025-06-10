@@ -57,9 +57,9 @@ source "vsphere-iso" "ubuntu" {
   // vSphere Settings
   datacenter                    = "${var.vsphere_datacenter}"
   cluster                       = "${var.vsphere_cluster}"
+  host                          = "${var.vsphere_resource_pool}"
   datastore                     = "${var.vsphere_datastore}"
   folder                        = "${var.vsphere_folder}"
-  host                          = "${var.vsphere_resource_pool}"
 
   // Virtual Machine Settings
   vm_name                       = "${local.build_vm_name}"
