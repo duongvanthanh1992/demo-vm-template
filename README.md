@@ -56,10 +56,10 @@ By doing so, you can reuse the container for subsequent workflows by referencing
    - This job also runs on a self-hosted runner and utilizes.
    - It checks out the source code and loads environment variables.
    - Packer is initialized and then used to build the VM template based on the specified configuration.
-   - After the template is built, Ansible is used to configure the template for Kafka deployment.
+   - After the template is built, Ansible is used to configure the template for Golden Image.
 
 4. **ansible-config (Run Ansible config template)**:
-   - Ansible is used to configure the VM template for Kafka deployment. ( using file inventory **ansible/`build_site`/.../...**)
+   - Ansible is used to configure the VM template for Golden Image deployment. ( using file inventory **ansible/`build_site`/.../...**)
    - It utilizes the `template-configuration.yml` playbook and sets various environment variables required for configuration.
 
 ## Topology
