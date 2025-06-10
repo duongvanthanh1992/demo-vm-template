@@ -51,7 +51,7 @@ source "vsphere-iso" "oracle-linux" {
   cluster                       = "${var.vsphere_cluster}"
   datastore                     = "${var.vsphere_datastore}"
   folder                        = "${var.vsphere_folder}"
-  resource_pool                 = "${var.vsphere_resource_pool}"
+  host                          = "${var.vsphere_resource_pool}"
 
   // Virtual Machine Settings
   vm_name                       = "${local.build_vm_name}"
