@@ -37,10 +37,6 @@ on:
           - "22-04"
           - "24-04"
 
-      vm_ip_address:
-        description: "IP of the guest operating system."
-        required: true
-
 permissions:
   contents: read
   packages: read
