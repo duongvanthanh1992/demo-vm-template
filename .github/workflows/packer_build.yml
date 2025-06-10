@@ -140,7 +140,7 @@ jobs:
           -var "vm_dns='${{ env.VCENTER_VM_DNS }}'"
           -var "vm_guest_os_name=${{ inputs.vm_guest_os_name }}"
           -var "vm_guest_os_version=${{ inputs.vm_guest_os_version }}"
-          ${{ inputs.vm_guest_os_name }}/
+          linux/${{ inputs.vm_guest_os_name }}/
 
       # DEBUG
       - name: Check Packer output
