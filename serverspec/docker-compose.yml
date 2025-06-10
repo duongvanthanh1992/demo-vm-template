@@ -1,0 +1,8 @@
+version: '3'
+services:
+  serverspec_check:
+    build:
+      context: .
+    container_name: serverspec
+    environment:
+    - KEY=/spec_rsa

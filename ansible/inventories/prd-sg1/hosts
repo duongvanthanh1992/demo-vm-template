@@ -1,0 +1,14 @@
+[ubuntu-20-04]
+ubuntu2004-prd-sg1
+
+[ubuntu-22-04]
+ubuntu2204-prd-sg1
+
+[ubuntu-24-04]
+ubuntu2404-prd-sg1
+
+[oracle-8]
+oracle8-prd-sg1
+
+[oracle-9]
+oracle9-prd-sg1
