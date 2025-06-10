@@ -14,3 +14,4 @@ ubuntu_list_package:
   - net-tools
   - unzip
   - xorriso
+  - chrony

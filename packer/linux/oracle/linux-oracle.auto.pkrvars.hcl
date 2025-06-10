@@ -20,5 +20,5 @@ vm_version                            = "19"
 vm_usb_controller                     = ["xhci"]
 vm_remove_cdrom                       = true
 vm_tools_upgrade_policy               = true
-iso_paths_01                          = ["[IIJVN-vSAN] Thanh-ISO/OracleLinux-R8-U10-x86_64-dvd.iso"]
-iso_paths_02                          = ["[IIJVN-vSAN] Thanh-ISO/OracleLinux-R9-U4-x86_64-dvd.iso"]
+iso_paths_01                          = ["[PURE-Vol04] ATDUONG-ISO/OracleLinux-R8-U10-x86_64-dvd.iso"]
+iso_paths_02                          = ["[PURE-Vol04] ATDUONG-ISO/OracleLinux-R9-U6-x86_64-dvd.iso"]

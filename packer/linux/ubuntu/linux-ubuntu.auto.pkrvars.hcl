@@ -20,9 +20,9 @@ vm_version                            = "19"
 vm_usb_controller                     = ["xhci"]
 vm_remove_cdrom                       = true
 vm_tools_upgrade_policy               = true
-iso_paths_01                          = ["[IIJVN-vSAN] Thanh-ISO/ubuntu-20.04.6-live-server-amd64.iso"]
-iso_paths_02                          = ["[IIJVN-vSAN] Thanh-ISO/ubuntu-22.04.4-live-server-amd64.iso"]
-iso_paths_03                          = ["[IIJVN-vSAN] Thanh-ISO/ubuntu-24.04-live-server-amd64.iso"]
+iso_paths_01                          = ["[PURE-Vol04] ATDUONG-ISO/ubuntu-20.04.6-live-server-amd64.iso"]
+iso_paths_02                          = ["[PURE-Vol04] ATDUONG-ISO/ubuntu-22.04.5-live-server-amd64.iso"]
+iso_paths_03                          = ["[PURE-Vol04] ATDUONG-ISO/ubuntu-24.04.2-live-server-amd64.iso"]
 
 // VM Storage Settings
 vm_disk_device                        = "sda"
