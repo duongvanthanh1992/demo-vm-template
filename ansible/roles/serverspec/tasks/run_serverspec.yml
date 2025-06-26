@@ -28,10 +28,10 @@
 - name: Print result of Serverspec test
   debug:
     msg: >-
-      Serverspec {{ 'FAILED' if serverspec_failed else 'PASSED' }}
+      Host {{ inventory_hostname_short }}: Serverspec {{ 'FAILED' if serverspec_failed else 'PASSED' }}
 
 - name: Fail if Serverspec test failed (but continue)
   ansible.builtin.fail:
-    msg: "Serverspec checked and found an example of the error. Exiting playbook."
+    msg: "Serverspec check on host {{ inventory_hostname_short }} found an error example."
   when: serverspec_failed
   ignore_errors: true

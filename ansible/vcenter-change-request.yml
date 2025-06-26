@@ -66,6 +66,6 @@
   gather_facts: false
   serial: 1
   tasks:
-    - name: Test VM Snapshot Workflow
+    - name: Run serverspec to verify after Ansible Pipeline for ServiceNow Change Request
       include_role:
         name: serverspec
