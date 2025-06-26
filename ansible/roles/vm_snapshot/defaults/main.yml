@@ -1,6 +1,6 @@
 ---
 
-serverspec_command: "linux ubuntu 20"
+serverspec_command: "linux ubuntu20"
 ubuntu_list_package:
   - bash-completion
   - apt-transport-https 
