@@ -111,7 +111,7 @@ jobs:
           -e "vsphere_username=${{ secrets.VSPHERE_USER }}"
           -e "vsphere_password=${{ secrets.VSPHERE_PASSWORD }}"
           -e "snapshot_name_chg=${{ inputs.change_request_number }}"
-          -e "host_clear_snapshot=${{ input.host_clear_snapshot }}"
+          -e "host_clear_snapshot=${{ inputs.host_clear_snapshot }}"
           vcenter-change-request.yml
 
       # - name: Clean Ansible
