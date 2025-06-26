@@ -5,12 +5,12 @@ os = ENV['OS']
 base_spec_dir = Pathname.new(File.join(File.dirname(__FILE__)))
 
 Dir[base_spec_dir.join("#{os}/*.rb")].sort.each do |f|
-  require f unless f.match?(/uom.*\.rb/)
+  require f unless f.match?(/user.*\.rb/)
 end
 
-if ENV['UOM_USER_ENABLED'].to_s.downcase == 'true'
-  Dir[base_spec_dir.join("#{os}/uom*.rb")].each do |uom_file|
-    require uom_file
+if ENV['LINUXROOT_USER_ENABLED'].to_s.downcase == 'true'
+  Dir[base_spec_dir.join("#{os}/user*.rb")].each do |user_file|
+    require user_file
   end
 end
 
