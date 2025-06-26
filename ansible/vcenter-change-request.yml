@@ -61,3 +61,11 @@
     - name: Test VM Snapshot Workflow
       include_role:
         name: vm_snapshot
+
+- hosts: all
+  gather_facts: false
+  serial: 1
+  tasks:
+    - name: Test VM Snapshot Workflow
+      include_role:
+        name: serverspec
