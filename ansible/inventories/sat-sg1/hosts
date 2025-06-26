@@ -1,14 +1,22 @@
-[ubuntu-20-04]
-ubuntu2004-sat-sg1
+# [ubuntu-20-04]
+# ubuntu2004-sat-sg1
+# 
+# [ubuntu-22-04]
+# ubuntu2204-sat-sg1
+# 
+# [ubuntu-24-04]
+# ubuntu2404-sat-sg1
+# 
+# [oracle-8]
+# oracle8-sat-sg1
+# 
+# [oracle-9]
+# oracle9-sat-sg1
 
-[ubuntu-22-04]
-ubuntu2204-sat-sg1
+[vm-db]
+tony-vm-db-01 vm_deploy_ip=172.16.14.75
+tony-vm-db-02 vm_deploy_ip=172.16.14.76
 
-[ubuntu-24-04]
-ubuntu2404-sat-sg1
-
-[oracle-8]
-oracle8-sat-sg1
-
-[oracle-9]
-oracle9-sat-sg1
+[vm-non-db]
+tony-vm-non-db-01 vm_deploy_ip=172.16.14.77
+tony-vm-non-db-02 vm_deploy_ip=172.16.14.78

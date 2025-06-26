@@ -1,0 +1,77 @@
+---
+
+- hosts: all
+  gather_facts: false
+  tasks:
+    - name: Add temporary DNS records to hosts file
+      vars:
+        hosts_content: |
+          {% for host in groups['all'] %}
+          {% if 'vm_deploy_ip' in hostvars[host] %}
+          {{ hostvars[host]['vm_deploy_ip'] }} {{ host }}
+          {% endif %}
+          {% endfor %}
+      ansible.builtin.blockinfile:
+        path: /etc/hosts
+        insertbefore: '# End of file'
+        block: "{{ hosts_content }}"
+      delegate_to: localhost
+
+    - name: Verify host connectivity before change request
+      ansible.builtin.ping:
+      ignore_unreachable: true
+      register: _test
+
+    - name: Retrieve VM information from vSphere before change request
+      community.vmware.vmware_vm_info:
+        hostname: "{{ vsphere_endpoint }}"
+        username: "{{ vsphere_username }}"
+        password: "{{ vsphere_password }}"
+        validate_certs: "{{ vsphere_validate }}"
+        vm_name: "{{ inventory_hostname_short }}"
+      delegate_to: localhost
+      register: _vm_info
+
+    - name: Gather current VM snapshot information before change request
+      community.vmware.vmware_guest_snapshot_info:
+        hostname: "{{ vsphere_endpoint }}"
+        username: "{{ vsphere_username }}"
+        password: "{{ vsphere_password }}"
+        validate_certs: "{{ vsphere_validate }}"
+        datacenter: "{{ vsphere_datacenter }}"
+        folder: "{{ vsphere_folder }}"
+        name: "{{ inventory_hostname_short }}"
+      delegate_to: localhost
+      register: _vm_snapshot_info
+
+    - name: Display VM guest details and snapshot state before change request
+      debug:
+        msg:
+          - vm_guest_name : "{{ _vm_info.virtual_machines[0].guest_name }}"
+          - vm_ip_address : "{{ _vm_info.virtual_machines[0].ip_address }}"
+          - power_state : "{{ _vm_info.virtual_machines[0].power_state }}"
+          - current_snapshot_before_chg : "{{ _vm_snapshot_info.guest_snapshots }}"
+
+    - name: Remove all existing snapshots if required 
+      community.vmware.vmware_guest_snapshot:
+        hostname: "{{ vsphere_endpoint }}"
+        username: "{{ vsphere_username }}"
+        password: "{{ vsphere_password }}"
+        validate_certs: "{{ vsphere_validate }}"
+        datacenter: "{{ vsphere_datacenter }}"
+        folder: "{{ vsphere_folder }}"
+        name: "{{ inventory_hostname_short }}"
+        state: remove_all
+      delegate_to: localhost
+      when:
+        - (inventory_hostname_short | lower) == ((host_clear_snapshot | default('none')) | lower)
+        - (_vm_snapshot_info.guest_snapshots | length) > 0
+
+    - name: Wait re-load service
+      ansible.builtin.wait_for:
+        timeout: 5
+      delegate_to: localhost
+
+    - name: Test VM Snapshot Workflow
+      include_role:
+        name: vm_snapshot

@@ -1,0 +1,20 @@
+---
+
+serverspec_command: "linux ubuntu 20"
+ubuntu_list_package:
+  - bash-completion
+  - apt-transport-https 
+  - ca-certificates 
+  - software-properties-common
+  - sshpass
+  - curl
+  - wget
+  - git
+  - jq
+  - iputils-ping
+  - net-tools
+  - unzip
+  - xorriso
+
+new_snapshot_name_chg: "Rollback after failed change - {{ snapshot_name_chg }}"
+new_snapshot_description_chg: "Auto-recovery: Restored state from {{ snapshot_name_chg }} after failed change."

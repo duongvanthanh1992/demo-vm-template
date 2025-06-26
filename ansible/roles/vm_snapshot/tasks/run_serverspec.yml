@@ -1,0 +1,30 @@
+---
+
+- name: Run Container Serverspec to check the VM Template
+  ansible.builtin.shell:
+    cmd: >
+      ./start.sh
+  environment:
+    OS: "{{ serverspec_command.split(' ')[0] }}"
+    VERSION: "{{ serverspec_command.split(' ')[1] }}"
+    TARGET: "{{ serverspec_command.split(' ')[2] }}"
+    LINUXROOT_USER_ENABLED: "{{ linuxroot_user_enabled | default(false) }}"
+    PACKAGE: "{{ ubuntu_list_package | join(' ') }}"
+  args:
+    chdir: ../serverspec/
+  delegate_to: localhost
+  register: _serverspec_result
+  ignore_errors: true
+
+- name: Print result of Serverspec
+  ansible.builtin.debug:
+    var: _serverspec_result.stdout
+
+- name: Check the result of Serverspec test
+  ansible.builtin.assert:
+    that:
+      - _serverspec_result.stdout |
+        regex_findall('Failed examples', multiline=True) |
+        length == 0
+    fail_msg: Serverspec checked and found an example of the error. Exiting playbook.
+    success_msg: Serverspec checked and VM passed"

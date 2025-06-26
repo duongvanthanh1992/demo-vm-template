@@ -1,0 +1,92 @@
+---
+
+- name: Create snapshot for the VM before change request
+  community.vmware.vmware_guest_snapshot:
+    hostname: "{{ vsphere_endpoint }}"
+    username: "{{ vsphere_username }}"
+    password: "{{ vsphere_password }}"
+    validate_certs: "{{ vsphere_validate }}"
+    datacenter: "{{ vsphere_datacenter }}"
+    folder: "{{ vsphere_folder }}"
+    name: "{{ inventory_hostname_short }}"
+    snapshot_name: "{{ snapshot_name_chg }}"
+    memory_dump: true
+    state: present
+  delegate_to: localhost
+
+- name: Wait re-load service
+  ansible.builtin.wait_for:
+    timeout: 10
+  delegate_to: localhost
+
+  # Use Ansible Block - Rescue - Always
+  # https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_blocks.html
+- name: Validate change request on VM groups
+  block:
+    # Ansible test block - we can replace these tasks in production environment
+    # import_playbook change request here
+    - import_tasks: task.yml
+
+    - name: Simulate failure for non-database VMs to test snapshot revert
+      fail:
+        msg: "Change request failed, testing snapshot revert."
+      when: "'vm-non-db' in group_names"
+
+  rescue:
+  - name: Revert VM to previous snapshot after failed change request
+    community.vmware.vmware_guest_snapshot:
+      hostname: "{{ vsphere_endpoint }}"
+      username: "{{ vsphere_username }}"
+      password: "{{ vsphere_password }}"
+      validate_certs: "{{ vsphere_validate }}"
+      datacenter: "{{ vsphere_datacenter }}"
+      folder: "{{ vsphere_folder }}"
+      name: "{{ inventory_hostname_short }}"
+      snapshot_name: "{{ snapshot_name_chg }}"
+      state: revert         
+    delegate_to: localhost
+    
+  - name: Rename reverted snapshot for tracking failure recovery
+    community.vmware.vmware_guest_snapshot:
+      hostname: "{{ vsphere_endpoint }}"
+      username: "{{ vsphere_username }}"
+      password: "{{ vsphere_password }}"
+      validate_certs: "{{ vsphere_validate }}"
+      datacenter: "{{ vsphere_datacenter }}"
+      folder: "{{ vsphere_folder }}"
+      name: "{{ inventory_hostname_short }}"
+      snapshot_name: "{{ snapshot_name_chg }}"
+      new_snapshot_name: "{{ new_snapshot_name_chg }}"
+      new_description: "{{ new_snapshot_description_chg }}"
+      state: present
+    delegate_to: localhost
+
+  always:
+  - name: Ensure VM is powered on after change request
+    community.vmware.vmware_guest_powerstate:
+      hostname: "{{ vsphere_endpoint }}"
+      username: "{{ vsphere_username }}"
+      password: "{{ vsphere_password }}"
+      validate_certs: "{{ vsphere_validate }}"
+      name: "{{ inventory_hostname_short }}"
+      state: powered-on
+    delegate_to: localhost
+
+  - name: Gather VM snapshot information after change request
+    community.vmware.vmware_guest_snapshot_info:
+      hostname: "{{ vsphere_endpoint }}"
+      username: "{{ vsphere_username }}"
+      password: "{{ vsphere_password }}"
+      validate_certs: "{{ vsphere_validate }}"
+      datacenter: "{{ vsphere_datacenter }}"
+      folder: "{{ vsphere_folder }}"
+      name: "{{ inventory_hostname_short }}"
+    delegate_to: localhost
+    register: _vm_snapshot_info_after
+
+  - name: Display VM snapshot information after change request
+    debug:
+      msg:
+        - current_snapshot_after_chg : "{{ _vm_snapshot_info_after.guest_snapshots.current_snapshot }}"
+
+- import_tasks: run_serverspec.yml

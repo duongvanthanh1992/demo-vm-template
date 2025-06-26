@@ -1,0 +1,29 @@
+---
+
+# Tasks to create the script
+- name: Add-packages script files to VM
+  ansible.builtin.template:
+    src: add-packages.sh.j2
+    dest: /tmp/add-packages.sh
+    mode: '0755'
+
+# Tasks to add packages
+- name: Add packages
+  ansible.builtin.shell:
+    cmd: |
+      ./add-packages.sh
+  args:
+    chdir: /tmp/
+
+# Tasks for restarting the SSH daemon.
+- name: "Restarting the SSH daemon."
+  systemd:
+    name: ssh
+    state: restarted
+    daemon_reload: true
+
+- name: Wait re-load service
+  ansible.builtin.wait_for:
+    timeout: 5
+  delegate_to: localhost
+
