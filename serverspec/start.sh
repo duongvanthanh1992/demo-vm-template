@@ -9,6 +9,6 @@ docker compose build \
 
 docker compose run \
     -e OS="$OS" \
-    -e UOM_USER_ENABLED="$UOM_USER_ENABLED" \
+    -e LINUXROOT_USER_ENABLED="$LINUXROOT_USER_ENABLED" \
     -e PACKAGE="$PACKAGE" \
     serverspec_check spec:"$TARGET"
