@@ -3,19 +3,19 @@
 - hosts: all
   gather_facts: false
   tasks:
-    - name: Add temporary DNS records to hosts file
-      vars:
-        hosts_content: |
-          {% for host in groups['all'] %}
-          {% if 'vm_deploy_ip' in hostvars[host] %}
-          {{ hostvars[host]['vm_deploy_ip'] }} {{ host }}
-          {% endif %}
-          {% endfor %}
-      ansible.builtin.blockinfile:
-        path: /etc/hosts
-        insertbefore: '# End of file'
-        block: "{{ hosts_content }}"
-      delegate_to: localhost
+    # - name: Add temporary DNS records to hosts file
+    #   vars:
+    #     hosts_content: |
+    #       {% for host in groups['all'] %}
+    #       {% if 'vm_deploy_ip' in hostvars[host] %}
+    #       {{ hostvars[host]['vm_deploy_ip'] }} {{ host }}
+    #       {% endif %}
+    #       {% endfor %}
+    #   ansible.builtin.blockinfile:
+    #     path: /etc/hosts
+    #     insertbefore: '# End of file'
+    #     block: "{{ hosts_content }}"
+    #   delegate_to: localhost
 
     - name: Verify host connectivity before change request
       ansible.builtin.ping:
