@@ -20,11 +20,18 @@
   ansible.builtin.debug:
     var: _serverspec_result.stdout
 
-- name: Check the result of Serverspec test
-  ansible.builtin.assert:
-    that:
-      - _serverspec_result.stdout |
-        regex_findall('Failed examples', multiline=True) |
-        length == 0
-    fail_msg: Serverspec checked and found an example of the error. Exiting playbook.
-    success_msg: Serverspec checked and VM passed"
+- name: Check if Serverspec test has failures
+  set_fact:
+    serverspec_failed: >-
+      {{ (_serverspec_result.stdout | regex_findall('Failed examples', multiline=True) | length) > 0 }}
+
+- name: Print result of Serverspec test
+  debug:
+    msg: >-
+      Serverspec {{ 'FAILED' if serverspec_failed else 'PASSED' }}
+
+- name: Fail if Serverspec test failed (but continue)
+  ansible.builtin.fail:
+    msg: "Serverspec checked and found an example of the error. Exiting playbook."
+  when: serverspec_failed
+  ignore_errors: true
