@@ -89,4 +89,24 @@
       msg:
         - current_snapshot_after_chg : "{{ _vm_snapshot_info_after.guest_snapshots.current_snapshot }}"
 
-- import_tasks: run_serverspec.yml
+- name: Wait until no other host is running serverspec
+  ansible.builtin.wait_for:
+    path: /tmp/serverspec.lock
+    state: absent
+    timeout: 3600
+  delegate_to: localhost
+
+- name: Create lock file for serverspec
+  ansible.builtin.file:
+    path: /tmp/serverspec.lock
+    state: touch
+  delegate_to: localhost
+
+- name: Run serverspec check
+  import_tasks: run_serverspec.yml
+
+- name: Remove lock file after serverspec
+  ansible.builtin.file:
+    path: /tmp/serverspec.lock
+    state: absent
+  delegate_to: localhost
