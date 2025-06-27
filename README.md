@@ -64,7 +64,7 @@ By doing so, you can reuse the container for subsequent workflows by referencing
 
 ## Topology
 
-![Topology](picture/gitlab.png)
+![Topology](picture/diagram.svg)
 
 
 ## Requirements
@@ -162,7 +162,7 @@ The packer directory contains the Packer build templates for each of the support
 
 #### Common Variables
 
-Edit the `packer\linux-rocky.auto.pkrvars.hcl` file to configure the following:
+Edit the `packer\linux\linux-ubuntu.auto.pkrvars.hcl` file to configure the following:
 
 ```hcl
 // vSphere Credentials & Settings - Input from Gitlab CI Workflow & file build-env/***.env
