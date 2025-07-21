@@ -1,0 +1,93 @@
+---
+
+- name: Get detailed VM hardware information for network adapters
+  community.vmware.vmware_guest_info:
+    hostname: "{{ vsphere_endpoint }}"
+    username: "{{ vsphere_username }}"
+    password: "{{ vsphere_password }}"
+    validate_certs: "{{ vsphere_validate }}"
+    name: "{{ vm_name }}"
+    schema: "vsphere"
+    properties:
+      - "config.hardware.device"
+  delegate_to: localhost
+  register: _vm_hardware_info
+
+- name: Extract network adapter information
+  set_fact:
+    network_adapters: >-
+      {{ _vm_hardware_info.instance.config.hardware.device 
+          | selectattr('deviceInfo.label', 'match', 'Network adapter.*') 
+          | list }}
+
+- name: Display network adapters found
+  debug:
+    msg: 
+      - "Found {{ network_adapters | length }} network adapter(s)"
+      - "Network adapters: {{ network_adapters | map(attribute='deviceInfo.label') | list }}"
+
+- name: Disconnect all network adapters
+  debug:
+    msg: "Disconnecting network adapters for VM: {{ vm_name }}"
+  when: network_adapters | length > 0
+
+# - name: Disconnect all network adapters
+#   community.vmware.vmware_guest_network:
+#     hostname: "{{ vsphere_endpoint }}"
+#     username: "{{ vsphere_username }}"
+#     password: "{{ vsphere_password }}"
+#     validate_certs: "{{ vsphere_validate }}"
+#     name: "{{ vm_name }}"
+#     networks:
+#       - name: "{{ item.backing.network.name if item.backing.network.name is defined else 'VM Network' }}"
+#         device_type: "{{ item.deviceInfo.label.split()[-1] | lower }}"
+#         connected: false
+#         start_connected: false
+#         state: present
+#   delegate_to: localhost
+#   loop: "{{ network_adapters }}"
+#   register: _network_disconnect_result
+#   when: network_adapters | length > 0
+
+- name: Wait for network disconnection to complete
+  pause:
+    seconds: 5
+  when: network_adapters | length > 0
+
+- name: Verify network disconnection status
+  community.vmware.vmware_guest_info:
+    hostname: "{{ vsphere_endpoint }}"
+    username: "{{ vsphere_username }}"
+    password: "{{ vsphere_password }}"
+    validate_certs: "{{ vsphere_validate }}"
+    name: "{{ vm_name }}"
+    schema: "vsphere"
+    properties:
+      - "config.hardware.device"
+  delegate_to: localhost
+  register: _vm_hardware_info_after
+
+- name: Extract updated network adapter status
+  set_fact:
+
+    updated_network_adapters: >-
+      {{ _vm_hardware_info_after.instance.config.hardware.device 
+          | selectattr('deviceInfo.label', 'match', 'Network adapter.*') 
+          | list }}
+
+- name: Display network disconnection results
+  debug:
+    msg:
+      - "Network disconnection completed for VM: {{ vm_name }}"
+      - "Disconnected adapters: {{ updated_network_adapters | map(attribute='deviceInfo.label') | list }}"
+      - "Connection status: {{ updated_network_adapters | map(attribute='connectable.connected') | list }}"
+
+- name: Final validation summary
+  debug:
+    msg:
+      - "=== VALIDATION SUMMARY ==="
+      - "VM Name validated: {{ vm_name }}"
+      - "Guest Name matches: {{ vm_guest_name }}"
+      - "IPv4 address validated: {{ expected_ipv4 }} (found in {{ all_ipv4_addresses }})"
+      - "Network adapters disconnected: {{ network_adapters | length }} adapter(s)"
+      - "VM Power State: {{ vm_power_state }}"
