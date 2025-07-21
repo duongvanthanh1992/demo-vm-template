@@ -8,53 +8,6 @@
       ignore_unreachable: true
       register: _connectivity_test
 
-    - name: Retrieve VM information from vSphere
-      community.vmware.vmware_vm_info:
-        hostname: "{{ vsphere_endpoint }}"
-        username: "{{ vsphere_username }}"
-        password: "{{ vsphere_password }}"
-        validate_certs: "{{ vsphere_validate }}"
-        vm_name: "{{ vm_name }}"
-      delegate_to: localhost
-      register: _vm_info
-
-    - name: Display {{ vm_name }} information
-      debug:
-        var: _vm_info
-
-    - name: Extract {{ vm_name }} details
-      set_fact:
-        _vm_guest_name: "{{ _vm_info.virtual_machines[0].guest_name }}"
-        _vm_power_state: "{{ _vm_info.virtual_machines[0].power_state }}"
-      when: _vm_info.virtual_machines | length > 0
-
-    - name: Extract all IPv4 addresses from all network interfaces
-      set_fact:
-        _list_ipv4_addresses: >-
-          {{ _vm_info.virtual_machines[0].vm_network.values() 
-             | map(attribute='ipv4') 
-             | list 
-             | flatten 
-             | map('regex_replace', '/.*$', '') }}
-
-    - name: Validate user input VM IPv4 address {{ vm_ipv4 }} exists in VM network interfaces
-      fail:
-        msg: |
-          User input VM IPv4 address '{{ vm_ipv4 }}' not found in VM network interfaces.
-          Available list IPv4 addresses: {{ _list_ipv4_addresses | default([]) }}
-          Please check if the IP address is correct or if the VM network is properly configured.
-      when:
-        - vm_ipv4 is defined
-        - vm_ipv4 | length > 0
-        - _list_ipv4_addresses is defined
-        - vm_ipv4 not in _list_ipv4_addresses
-
-    - name: VM information verification {{ vm_name }} successful
-      debug:
-        msg: 
-          - "User input VM Name    :  {{ vm_name }}"
-          - "vCenter ouput VM Name :  {{ _vm_guest_name }}"
-          - "----------------------------------------------------"
-          - "User input VM IPv4 addresses : {{ vm_ipv4 }}"
-          - "vCenter ouput list IPv4 addresses found : {{ _list_ipv4_addresses | default([])}}"
-          - "vCenter ouput Power State: {{ _vm_power_state }}"
+    - name: Check Decom
+      include_role:
+        name: vm_decom
