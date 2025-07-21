@@ -173,7 +173,7 @@ jobs:
           -e "template_os_distribution=${{ inputs.vm_guest_os_name }}-${{ inputs.vm_guest_os_version }}"
           -e "os_distribution=${{ inputs.vm_guest_os_name }}"
           -e "ansible_host=${{ env.VSPHERE_VM_IP }}"
-          template-configuration.yml
+          template-configuration.yaml
 
       - name: Clean Ansible
         if: ${{ failure() && steps.ansible.outcome == 'failure' }}
@@ -185,4 +185,4 @@ jobs:
           -e "vsphere_username=${{ secrets.VSPHERE_USER }}"
           -e "vsphere_password=${{ secrets.VSPHERE_PASSWORD }}"
           -e "vsphere_template_final=${{ env.PACKER_TEMPLATE_NAME }}-final"
-          clear-template.yml
+          clear-template.yaml

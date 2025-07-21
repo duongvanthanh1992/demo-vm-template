@@ -1,0 +1,20 @@
+---
+
+- hosts: all
+  gather_facts: false
+  tasks:
+    - name: Verify host connectivity before change request
+      ansible.builtin.ping:
+      ignore_unreachable: true
+      register: _test
+
+    - name: Retrieve VM information from vSphere before change request
+      community.vmware.vmware_vm_info:
+        hostname: "{{ vsphere_endpoint }}"
+        username: "{{ vsphere_username }}"
+        password: "{{ vsphere_password }}"
+        validate_certs: "{{ vsphere_validate }}"
+        vm_name: "{{ inventory_hostname_short }}"
+      delegate_to: localhost
+      register: _vm_info
+
