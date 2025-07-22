@@ -1,5 +1,4 @@
 ---
-
 - name: Get detailed VM hardware information for network adapters
   community.vmware.vmware_guest_info:
     hostname: "{{ vsphere_endpoint }}"
@@ -26,34 +25,79 @@
       - "Found {{ _list_network_adapters | length }} network adapter(s)"
       - "Network adapters: {{ _list_network_adapters | map(attribute='deviceInfo.label') | list }}"
 
-# - name: Disconnect all network adapters
-#   debug:
-#     msg: "Disconnecting network adapters for VM: {{ vm_name }}"
-#   when: _list_network_adapters | length > 0
-
-- name: Disconnect all network adapters
+- name: Disconnect network adapters using vmware_guest_network
   community.vmware.vmware_guest_network:
     hostname: "{{ vsphere_endpoint }}"
     username: "{{ vsphere_username }}"
     password: "{{ vsphere_password }}"
     validate_certs: "{{ vsphere_validate }}"
     name: "{{ vm_name }}"
-    networks:
-      - name: "{{ item.backing.network.name if item.backing.network.name is defined else 'VM Network' }}"
-        device_type: "{{ item.deviceInfo.label.split()[-1] | lower }}"
-        connected: false
-        start_connected: false
-        state: present
+    device_type: "{{ item._vimtype.split('.')[-1] | lower }}"
+    label: "{{ item.deviceInfo.label }}"
+    connected: false
+    start_connected: false
+    state: present
   delegate_to: localhost
   loop: "{{ _list_network_adapters }}"
   when: _list_network_adapters | length > 0
+  register: network_disconnect_result
+  ignore_errors: yes
+
+# # Method 2: Alternative using vmware_guest (if Method 1 fails)
+# - name: Disconnect network adapters using vmware_guest (fallback method)
+#   community.vmware.vmware_guest:
+#     hostname: "{{ vsphere_endpoint }}"
+#     username: "{{ vsphere_username }}"
+#     password: "{{ vsphere_password }}"
+#     validate_certs: "{{ vsphere_validate }}"
+#     name: "{{ vm_name }}"
+#     networks:
+#       - name: "{{ item.backing.port.portgroupKey if item.backing._vimtype == 'vim.vm.device.VirtualEthernetCard.DistributedVirtualPortBackingInfo' else (item.backing.network.name | default('VM Network')) }}"
+#         device_type: "{{ item._vimtype.split('.')[-1] | lower }}"
+#         connected: false
+#         start_connected: false
+#     state: present
+#   delegate_to: localhost
+#   loop: "{{ _list_network_adapters }}"
+#   when: 
+#     - _list_network_adapters | length > 0
+#     - network_disconnect_result is failed
+#   ignore_errors: yes
+
+# # Method 3: Using PyVmomi direct approach (most reliable)
+# - name: Disconnect network adapters using direct VM reconfiguration
+#   community.vmware.vmware_guest:
+#     hostname: "{{ vsphere_endpoint }}"
+#     username: "{{ vsphere_username }}"
+#     password: "{{ vsphere_password }}"
+#     validate_certs: "{{ vsphere_validate }}"
+#     name: "{{ vm_name }}"
+#     hardware:
+#       num_cpus: "{{ _vm_hardware_info.instance.config.hardware.numCPU }}"
+#       memory_mb: "{{ _vm_hardware_info.instance.config.hardware.memoryMB }}"
+#     networks: "{{ _disconnected_networks }}"
+#     state: present
+#   vars:
+#     _disconnected_networks: >-
+#       {{
+#         _list_network_adapters | map('combine', {
+#           'name': item.backing.port.portgroupKey if item.backing._vimtype == 'vim.vm.device.VirtualEthernetCard.DistributedVirtualPortBackingInfo' 
+#                   else (item.backing.network.name | default('VM Network')),
+#           'device_type': item._vimtype.split('.')[-1] | lower,
+#           'connected': false,
+#           'start_connected': false,
+#           'mac': item.macAddress
+#         }) | list
+#       }}
+#   delegate_to: localhost
+#   when: _list_network_adapters | length > 0
 
 - name: Wait for network disconnection to complete
   pause:
     seconds: 5
   when: _list_network_adapters | length > 0
 
-- name: Add Notes to VM {{ vm_name }} for decommission for tracking
+- name: Add Notes to VM {{ vm_name }} for decommission tracking
   community.vmware.vmware_guest:
     hostname: "{{ vsphere_endpoint }}"
     username: "{{ vsphere_username }}"
@@ -62,9 +106,10 @@
     name: "{{ vm_name }}"
     annotation: |
       Decommission scheduled via Ansible Workflow
-       • Timestamp         : {{ '%Y-%m-%d %H:%M' | strftime(ansible_date_time.epoch) }}
+       • Timestamp         : {{ '%Y-%m-%d %H:%M' | strftime }}
        • Initiated By      : {{ workflow_initiator }}
        • Change Request ID : {{ change_request_number }}
+       • Network Status    : All adapters disconnected
   delegate_to: localhost
 
 - name: Verify network disconnection status
@@ -93,6 +138,20 @@
       - "=== VALIDATION SUMMARY ==="
       - "Network disconnection completed for VM: {{ vm_name }} - IPv4 address: {{ vm_ipv4 }}"
       - "VM Power State: {{ _vm_power_state }}"
-      - "Disconnected adapters: {{ _updated_list_network_adapters | map(attribute='deviceInfo.label') | list }}"
+      - "Total adapters found: {{ _updated_list_network_adapters | length }}"
+      - "Adapter labels: {{ _updated_list_network_adapters | map(attribute='deviceInfo.label') | list }}"
       - "Connection status: {{ _updated_list_network_adapters | map(attribute='connectable.connected') | list }}"
-      - "Network adapters disconnected: {{ _updated_list_network_adapters | length }} adapter(s)"
+      - "Start connected status: {{ _updated_list_network_adapters | map(attribute='connectable.startConnected') | list }}"
+      - "MAC addresses: {{ _updated_list_network_adapters | map(attribute='macAddress') | list }}"
+
+- name: Fail if any network adapters are still connected
+  fail:
+    msg: "Some network adapters are still connected: {{ _still_connected }}"
+  vars:
+    _still_connected: >-
+      {{ _updated_list_network_adapters 
+          | selectattr('connectable.connected', 'equalto', true) 
+          | map(attribute='deviceInfo.label') 
+          | list }}
+  when: 
+    - _updated_list_network_adapters | selectattr('connectable.connected', 'equalto', true) | list | length > 0
