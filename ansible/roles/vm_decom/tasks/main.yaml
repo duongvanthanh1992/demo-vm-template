@@ -52,5 +52,5 @@
       - "vCenter ouput Power State: {{ _vm_power_state }}"
 
 - name: Disable network card for VM {{ vm_name }}
-  include_task: disable_vm_network.yaml
+  include_tasks: disable_vm_network.yaml
   when: disable_vm_network_card | default(false)
