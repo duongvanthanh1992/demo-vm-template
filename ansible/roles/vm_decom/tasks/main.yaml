@@ -43,10 +43,12 @@
 
 - name: VM information verification {{ vm_name }} successful
   debug:
-    msg: 
+    msg:
+      - "ServiceNow Change Request ID : {{ change_request_number }}"
+      - "##########################################################"
       - "User input VM Name    :  {{ vm_name }}"
       - "vCenter ouput VM Name :  {{ _vm_guest_name }}"
-      - "----------------------------------------------------"
+      - "##########################################################"
       - "User input VM IPv4 addresses : {{ vm_ipv4 }}"
       - "vCenter ouput list IPv4 addresses found : {{ _list_ipv4_addresses | default([])}}"
       - "vCenter ouput Power State: {{ _vm_power_state }}"

@@ -29,7 +29,7 @@ on:
 
       vm_ipv4:
         description: "Enter the VM IPv4."
-        required: false
+        required: true
         default: ""
 
 permissions:
