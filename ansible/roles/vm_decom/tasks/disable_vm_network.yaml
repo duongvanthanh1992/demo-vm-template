@@ -93,5 +93,5 @@
       - "VM Power State: {{ _vm_power_state }}"
       - "Total adapters found: {{ _updated_list_network_adapters | length }}"
       - "MAC addresses: {{ _updated_list_network_adapters | map(attribute='macAddress') | list }}"
-      - "IPv4s from vCenter: {{ _list_ipv4_addresses | default([])}}
+      - "IPv4s from vCenter: {{ _list_ipv4_addresses | default([])}}"
       - "Connection status: {{ _updated_list_network_adapters | map(attribute='connectable.connected') | list }}"
