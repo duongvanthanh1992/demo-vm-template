@@ -17,6 +17,11 @@ on:
           - "sat-sg1"
           - "prd-sg1"
 
+      change_request_number: 
+        description: "Enter the ServiceNow Change Request number (e.g., CHG0031265)"
+        required: true
+        default: "CHG0031265"
+
       vm_name: 
         description: "Enter the VM Name."
         required: true
@@ -126,5 +131,7 @@ jobs:
           -e "vsphere_password=${{ secrets.VSPHERE_PASSWORD }}"
           -e "vm_name=${{ inputs.vm_name }}"
           -e "vm_ipv4=${{ inputs.vm_ipv4 }}"
+          -e "change_request_number=${{ inputs.change_request_number }}"
+          -e "workflow_initiator=${{ github.actor }}"
           -e "disable_vm_network_card=true"
           vcenter-decom-vm.yaml

@@ -1,13 +1,8 @@
 ---
 
 - hosts: localhost
-  gather_facts: false
+  gather_facts: true
   tasks:
-    - name: Verify host connectivity
-      ansible.builtin.ping:
-      ignore_unreachable: true
-      register: _connectivity_test
-
-    - name: Check Decom
+    - name: Include role to decommission VM
       include_role:
         name: vm_decom
