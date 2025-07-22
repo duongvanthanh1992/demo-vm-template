@@ -53,8 +53,8 @@
 
 - name: Disable network card for VM {{ vm_name }}
   include: disable_vm_network.yaml
-    vars:
-      _vm_guest_name: "{{ _vm_guest_name }}"
-      _list_ipv4_addresses: "{{ _list_ipv4_addresses }}"
-      _vm_power_state: "{{ _vm_power_state }}"
+  vars:
+    _vm_guest_name: "{{ _vm_guest_name }}"
+    _list_ipv4_addresses: "{{ _list_ipv4_addresses }}"
+    _vm_power_state: "{{ _vm_power_state }}"
   when: disable_vm_network_card | default(false)
