@@ -80,7 +80,7 @@
        • Timestamp         : {{ '%Y-%m-%d %H:%M' | strftime }}
        • Change Request ID : {{ change_request_number }}
        • Initiated By      : {{ workflow_initiator }}
-       • IPv4s from vCenter: {{ _list_ipv4_addresses | default([])}}
+       • IPv4 addresses    : {{ _list_ipv4_addresses | default([])}}
        • MAC addresses     : {{ _updated_list_network_adapters | map(attribute='macAddress') | list }}
        • Network Status    : All adapters disconnected
   delegate_to: localhost
@@ -92,6 +92,6 @@
       - "Network disconnection completed for VM: {{ vm_name }} - IPv4 address: {{ vm_ipv4 }}"
       - "VM Power State: {{ _vm_power_state }}"
       - "Total adapters found: {{ _updated_list_network_adapters | length }}"
+      - "IPv4 addresses: {{ _list_ipv4_addresses | default([])}}"
       - "MAC addresses: {{ _updated_list_network_adapters | map(attribute='macAddress') | list }}"
-      - "IPv4s from vCenter: {{ _list_ipv4_addresses | default([])}}"
       - "Connection status: {{ _updated_list_network_adapters | map(attribute='connectable.connected') | list }}"
