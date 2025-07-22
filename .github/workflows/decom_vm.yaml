@@ -98,6 +98,7 @@ jobs:
           -e "vsphere_password=${{ secrets.VSPHERE_PASSWORD }}"
           -e "vm_name=${{ inputs.vm_name }}"
           -e "vm_ipv4=${{ inputs.vm_ipv4 }}"
+          -e "change_request_number=${{ inputs.change_request_number }}"
           vcenter-decom-vm.yaml
 
   ansible-decom-vm:
