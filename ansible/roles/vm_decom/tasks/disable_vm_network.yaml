@@ -74,19 +74,12 @@
           | selectattr('deviceInfo.label', 'match', 'Network adapter.*') 
           | list }}
 
-- name: Display network disconnection results
-  debug:
-    msg:
-      - "Network disconnection completed for VM: {{ vm_name }}"
-      - "Disconnected adapters: {{ _updated_list_network_adapters | map(attribute='deviceInfo.label') | list }}"
-      - "Connection status: {{ _updated_list_network_adapters | map(attribute='connectable.connected') | list }}"
-
-- name: Final validation summary
+- name: Display network disconnection results - Final validation summary
   debug:
     msg:
       - "=== VALIDATION SUMMARY ==="
-      - "VM Name validated: {{ vm_name }}"
-      - "Guest Name matches: {{ _vm_guest_name }}"
-      - "IPv4 address validated: {{ vm_ipv4 }} (found in {{ _list_ipv4_addresses }})"
-      - "Network adapters disconnected: {{ _updated_list_network_adapters | length }} adapter(s)"
+      - "Network disconnection completed for VM: {{ vm_name }} - IPv4 address: {{ vm_ipv4 }}"
       - "VM Power State: {{ _vm_power_state }}"
+      - "Disconnected adapters: {{ _updated_list_network_adapters | map(attribute='deviceInfo.label') | list }}"
+      - "Connection status: {{ _updated_list_network_adapters | map(attribute='connectable.connected') | list }}"
+      - "Network adapters disconnected: {{ _updated_list_network_adapters | length }} adapter(s)"
