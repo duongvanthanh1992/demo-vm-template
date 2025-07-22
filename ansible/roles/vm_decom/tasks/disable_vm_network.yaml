@@ -48,23 +48,6 @@
     seconds: 5
   when: _list_network_adapters | length > 0
 
-- name: Add Notes to VM {{ vm_name }} for decommission tracking
-  community.vmware.vmware_guest:
-    hostname: "{{ vsphere_endpoint }}"
-    username: "{{ vsphere_username }}"
-    password: "{{ vsphere_password }}"
-    validate_certs: "{{ vsphere_validate }}"
-    name: "{{ vm_name }}"
-    annotation: |
-      Decommission scheduled via Ansible Workflow
-       • Timestamp         : {{ '%Y-%m-%d %H:%M' | strftime }}
-       • Change Request ID : {{ change_request_number }}
-       • Initiated By      : {{ workflow_initiator }}
-       • VM                : {{ vm_name }}
-       • IPv4s from vCenter: {{ _list_ipv4_addresses | default([])}}
-       • Network Status    : All adapters disconnected
-  delegate_to: localhost
-
 - name: Verify network disconnection status
   community.vmware.vmware_guest_info:
     hostname: "{{ vsphere_endpoint }}"
@@ -85,6 +68,23 @@
           | selectattr('deviceInfo.label', 'match', 'Network adapter.*') 
           | list }}
 
+- name: Add Notes to VM {{ vm_name }} for decommission tracking
+  community.vmware.vmware_guest:
+    hostname: "{{ vsphere_endpoint }}"
+    username: "{{ vsphere_username }}"
+    password: "{{ vsphere_password }}"
+    validate_certs: "{{ vsphere_validate }}"
+    name: "{{ vm_name }}"
+    annotation: |
+      Decommission scheduled via Ansible Workflow
+       • Timestamp         : {{ '%Y-%m-%d %H:%M' | strftime }}
+       • Change Request ID : {{ change_request_number }}
+       • Initiated By      : {{ workflow_initiator }}
+       • IPv4s from vCenter: {{ _list_ipv4_addresses | default([])}}
+       • MAC addresses     : {{ _updated_list_network_adapters | map(attribute='macAddress') | list }}
+       • Network Status    : All adapters disconnected
+  delegate_to: localhost
+
 - name: Display network disconnection results - Final validation summary
   debug:
     msg:
@@ -92,7 +92,6 @@
       - "Network disconnection completed for VM: {{ vm_name }} - IPv4 address: {{ vm_ipv4 }}"
       - "VM Power State: {{ _vm_power_state }}"
       - "Total adapters found: {{ _updated_list_network_adapters | length }}"
-      - "Adapter labels: {{ _updated_list_network_adapters | map(attribute='deviceInfo.label') | list }}"
-      - "Connection status: {{ _updated_list_network_adapters | map(attribute='connectable.connected') | list }}"
       - "MAC addresses: {{ _updated_list_network_adapters | map(attribute='macAddress') | list }}"
-      - "IPv4s from vCenter: {{ _list_ipv4_addresses | default([])}}"
+      - "IPv4s from vCenter: {{ _list_ipv4_addresses | default([])}}
+      - "Connection status: {{ _updated_list_network_adapters | map(attribute='connectable.connected') | list }}"
