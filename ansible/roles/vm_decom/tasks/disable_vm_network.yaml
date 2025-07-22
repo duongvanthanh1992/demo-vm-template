@@ -15,7 +15,7 @@
 
 - name: Extract network adapter information
   set_fact:
-    network_adapters: >-
+    _list_network_adapters: >-
       {{ _vm_hardware_info.instance.config.hardware.device 
           | selectattr('deviceInfo.label', 'match', 'Network adapter.*') 
           | list }}
@@ -23,13 +23,13 @@
 - name: Display network adapters found
   debug:
     msg: 
-      - "Found {{ network_adapters | length }} network adapter(s)"
-      - "Network adapters: {{ network_adapters | map(attribute='deviceInfo.label') | list }}"
+      - "Found {{ _list_network_adapters | length }} network adapter(s)"
+      - "Network adapters: {{ _list_network_adapters | map(attribute='deviceInfo.label') | list }}"
 
 - name: Disconnect all network adapters
   debug:
     msg: "Disconnecting network adapters for VM: {{ vm_name }}"
-  when: network_adapters | length > 0
+  when: _list_network_adapters | length > 0
 
 # - name: Disconnect all network adapters
 #   community.vmware.vmware_guest_network:
@@ -69,8 +69,7 @@
 
 - name: Extract updated network adapter status
   set_fact:
-
-    updated_network_adapters: >-
+    _updated_list_network_adapters: >-
       {{ _vm_hardware_info_after.instance.config.hardware.device 
           | selectattr('deviceInfo.label', 'match', 'Network adapter.*') 
           | list }}
@@ -79,15 +78,15 @@
   debug:
     msg:
       - "Network disconnection completed for VM: {{ vm_name }}"
-      - "Disconnected adapters: {{ updated_network_adapters | map(attribute='deviceInfo.label') | list }}"
-      - "Connection status: {{ updated_network_adapters | map(attribute='connectable.connected') | list }}"
+      - "Disconnected adapters: {{ _updated_list_network_adapters | map(attribute='deviceInfo.label') | list }}"
+      - "Connection status: {{ _updated_list_network_adapters | map(attribute='connectable.connected') | list }}"
 
 - name: Final validation summary
   debug:
     msg:
       - "=== VALIDATION SUMMARY ==="
       - "VM Name validated: {{ vm_name }}"
-      - "Guest Name matches: {{ vm_guest_name }}"
-      - "IPv4 address validated: {{ expected_ipv4 }} (found in {{ all_ipv4_addresses }})"
-      - "Network adapters disconnected: {{ network_adapters | length }} adapter(s)"
-      - "VM Power State: {{ vm_power_state }}"
+      - "Guest Name matches: {{ _vm_guest_name }}"
+      - "IPv4 address validated: {{ vm_ipv4 }} (found in {{ _list_ipv4_addresses }})"
+      - "Network adapters disconnected: {{ _updated_list_network_adapters | length }} adapter(s)"
+      - "VM Power State: {{ _vm_power_state }}"

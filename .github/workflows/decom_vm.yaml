@@ -53,7 +53,7 @@ jobs:
   validate-vm-information:
     needs: [pre]
     runs-on: [self-hosted, "${{ needs.pre.outputs.ansible_runner }}"]
-    environment: "${{ inputs.build_site }}"
+    environment: "${{ inputs.build_site }}-validation"
     container:
           image: "${{ needs.pre.outputs.ansible_image }}"
           volumes:
@@ -88,9 +88,55 @@ jobs:
         run: >-
           ansible-playbook
           -i inventories/${{ inputs.build_site }}/hosts
-          -e "vsphere_endpoint=${{ secrets.vsphere_endpoint }}"
-          -e "vsphere_username=${{ secrets.vsphere_username }}"
-          -e "vsphere_password=${{ secrets.vsphere_password }}"
+          -e "vsphere_endpoint=${{ secrets.VSPHERE_ENDPOINT }}"
+          -e "vsphere_username=${{ secrets.VSPHERE_USERNAME }}"
+          -e "vsphere_password=${{ secrets.VSPHERE_PASSWORD }}"
           -e "vm_name=${{ inputs.vm_name }}"
           -e "vm_ipv4=${{ inputs.vm_ipv4 }}"
+          vcenter-decom-vm.yaml
+
+  ansible-decom-vm:
+    needs: [pre, validate-vm-information]
+    runs-on: [self-hosted, "${{ needs.pre.outputs.ansible_runner }}"]
+    environment: "${{ inputs.build_site }}-approved"
+    container:
+          image: "${{ needs.pre.outputs.ansible_image }}"
+          volumes:
+            - /var/run/docker.sock:/var/run/docker.sock
+          credentials:
+            username: ${{ github.actor }}
+            password: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Load env from default location
+        run: >-
+          grep -v -e '^\s*#' -e '^\s*$' "build-env/${{ inputs.build_site }}.env"
+          >> $GITHUB_ENV
+
+      # DEBUG
+      - name: Print env
+        run: |
+          printenv
+
+      # DEBUG
+      - name: Print ansible version
+        run: |
+          ansible-playbook --version
+          ansible-galaxy role list || true
+          ansible-galaxy collection list || true
+
+      - name: Run Ansible
+        id: ansible
+        working-directory: ansible/
+        run: >-
+          ansible-playbook
+          -i inventories/${{ inputs.build_site }}/hosts
+          -e "vsphere_endpoint=${{ secrets.VSPHERE_ENDPOINT }}"
+          -e "vsphere_username=${{ secrets.VSPHERE_USERNAME }}"
+          -e "vsphere_password=${{ secrets.VSPHERE_PASSWORD }}"
+          -e "vm_name=${{ inputs.vm_name }}"
+          -e "vm_ipv4=${{ inputs.vm_ipv4 }}"
+          -e "disable_vm_network_card=true"
           vcenter-decom-vm.yaml
