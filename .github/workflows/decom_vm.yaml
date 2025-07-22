@@ -115,18 +115,6 @@ jobs:
           grep -v -e '^\s*#' -e '^\s*$' "build-env/${{ inputs.build_site }}.env"
           >> $GITHUB_ENV
 
-      # DEBUG
-      - name: Print env
-        run: |
-          printenv
-
-      # DEBUG
-      - name: Print ansible version
-        run: |
-          ansible-playbook --version
-          ansible-galaxy role list || true
-          ansible-galaxy collection list || true
-
       - name: Run Ansible
         id: ansible
         working-directory: ansible/
