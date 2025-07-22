@@ -52,7 +52,7 @@
 - name: Wait for network disconnection to complete
   pause:
     seconds: 5
-  when: network_adapters | length > 0
+  when: _list_network_adapters | length > 0
 
 - name: Verify network disconnection status
   community.vmware.vmware_guest_info:
